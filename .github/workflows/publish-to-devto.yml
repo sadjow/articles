@@ -1,0 +1,136 @@
+name: Publish to dev.to
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'technical/**/*.md'
+      - 'essays/**/*.md'
+      - 'guides/**/*.md'
+  workflow_dispatch:
+    inputs:
+      article_path:
+        description: 'Path to article (e.g., technical/2025/article.md)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install gray-matter node-fetch
+
+      - name: Find articles to publish
+        id: find-articles
+        run: |
+          if [ -n "${{ github.event.inputs.article_path }}" ]; then
+            echo "articles=${{ github.event.inputs.article_path }}" >> $GITHUB_OUTPUT
+          else
+            # Find modified markdown files
+            articles=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(md|markdown)$' | grep -E '^(technical|essays|guides)/' || true)
+            echo "articles=$articles" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish articles
+        if: steps.find-articles.outputs.articles != ''
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+        run: |
+          cat > publish.js << 'EOF'
+          const fs = require('fs');
+          const matter = require('gray-matter');
+          const fetch = require('node-fetch');
+
+          async function publishToDevTo(filePath) {
+            try {
+              // Read the file
+              const fileContent = fs.readFileSync(filePath, 'utf8');
+              const { data: frontmatter, content } = matter(fileContent);
+
+              // Check if article should be published
+              if (frontmatter.published === false) {
+                console.log(`Skipping ${filePath} - published: false`);
+                return;
+              }
+
+              // Prepare article data
+              const article = {
+                title: frontmatter.title,
+                body_markdown: content,
+                published: true,
+                tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
+                description: frontmatter.description || '',
+                canonical_url: frontmatter.canonical_url || `https://github.com/sadjow/articles/blob/main/${filePath}`,
+              };
+
+              if (frontmatter.cover_image) {
+                article.main_image = frontmatter.cover_image;
+              }
+
+              if (frontmatter.series) {
+                article.series = frontmatter.series;
+              }
+
+              // Make API request
+              const response = await fetch('https://dev.to/api/articles', {
+                method: 'POST',
+                headers: {
+                  'api-key': process.env.DEV_TO_API_KEY,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ article }),
+              });
+
+              if (response.ok) {
+                const result = await response.json();
+                console.log(`✅ Published: ${frontmatter.title}`);
+                console.log(`   URL: ${result.url}`);
+                
+                // Update the file with dev.to URL
+                const updatedContent = fileContent.replace(
+                  'canonical_url: ',
+                  `canonical_url: ${result.url}`
+                );
+                fs.writeFileSync(filePath, updatedContent);
+              } else {
+                const error = await response.text();
+                console.error(`❌ Failed to publish ${filePath}: ${error}`);
+              }
+            } catch (error) {
+              console.error(`❌ Error processing ${filePath}: ${error.message}`);
+            }
+          }
+
+          // Process articles
+          const articles = process.argv[2].split('\n').filter(Boolean);
+          
+          (async () => {
+            for (const article of articles) {
+              await publishToDevTo(article);
+            }
+          })();
+          EOF
+
+          node publish.js "${{ steps.find-articles.outputs.articles }}"
+
+      - name: Commit URL updates
+        if: steps.find-articles.outputs.articles != ''
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: update canonical URLs after dev.to publish"
+          git push
