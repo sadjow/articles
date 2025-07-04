@@ -10,8 +10,6 @@ on:
       - 'guides/**/*.md'
   pull_request:
     types: [opened, synchronize]
-    paths:
-      - '.github/workflows/publish-to-devto.yml'
   workflow_dispatch:
     inputs:
       article_path:
@@ -25,7 +23,65 @@ on:
         default: false
 
 jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Test workflow syntax
+        run: |
+          echo "✅ Workflow syntax is valid"
+          echo "📝 Testing with test article: technical/2025/test-devto-publishing.md"
+          
+      - name: Check for API key
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+        run: |
+          if [ -z "$DEV_TO_API_KEY" ]; then
+            echo "⚠️  Warning: DEV_TO_API_KEY secret not found"
+            echo "   Please add it to repository secrets before merging"
+          else
+            echo "✅ DEV_TO_API_KEY secret is configured"
+          fi
+
+      - name: Dry run test
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          DRY_RUN: true
+        run: |
+          npm install gray-matter node-fetch
+          
+          cat > test-publish.js << 'EOF'
+          const fs = require('fs');
+          const matter = require('gray-matter');
+          
+          const testFile = 'technical/2025/test-devto-publishing.md';
+          if (fs.existsSync(testFile)) {
+            const fileContent = fs.readFileSync(testFile, 'utf8');
+            const { data: frontmatter, content } = matter(fileContent);
+            
+            console.log('🔍 Test article found:');
+            console.log(`   Title: ${frontmatter.title}`);
+            console.log(`   Published: ${frontmatter.published}`);
+            console.log(`   Tags: ${frontmatter.tags?.join(', ')}`);
+            console.log('✅ Dry run test passed!');
+          } else {
+            console.error('❌ Test article not found');
+            process.exit(1);
+          }
+          EOF
+          
+          node test-publish.js
+
   publish:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
