@@ -177,11 +177,18 @@ jobs:
                 console.log(`✅ Published: ${frontmatter.title}`);
                 console.log(`   URL: ${result.url}`);
                 
-                // Update the file with dev.to URL
-                const updatedContent = fileContent.replace(
+                // Update the file with dev.to URL and published status
+                let updatedContent = fileContent.replace(
                   'canonical_url: ',
                   `canonical_url: ${result.url}`
                 );
+                
+                // Also update published status to true
+                updatedContent = updatedContent.replace(
+                  /published:\s*false/,
+                  'published: true'
+                );
+                
                 fs.writeFileSync(filePath, updatedContent);
               } else {
                 const error = await response.text();
@@ -210,5 +217,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git diff --staged --quiet || git commit -m "chore: update canonical URLs after dev.to publish"
+          git diff --staged --quiet || git commit -m "chore: update published status and canonical URLs after dev.to publish"
           git push
