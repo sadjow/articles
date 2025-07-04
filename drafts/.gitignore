@@ -1,0 +1,8 @@
+# Ignore all files in drafts by default
+*
+
+# But track this .gitignore
+!.gitignore
+
+# Track specific drafts when ready
+# !ready-to-review-article.md
