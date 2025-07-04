@@ -8,12 +8,21 @@ on:
       - 'technical/**/*.md'
       - 'essays/**/*.md'
       - 'guides/**/*.md'
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/publish-to-devto.yml'
   workflow_dispatch:
     inputs:
       article_path:
         description: 'Path to article (e.g., technical/2025/article.md)'
         required: false
         type: string
+      dry_run:
+        description: 'Dry run (test without publishing)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   publish:
@@ -48,6 +57,7 @@ jobs:
         if: steps.find-articles.outputs.articles != ''
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
           cat > publish.js << 'EOF'
           const fs = require('fs');
@@ -82,6 +92,18 @@ jobs:
 
               if (frontmatter.series) {
                 article.series = frontmatter.series;
+              }
+
+              // Check for dry run
+              const isDryRun = process.env.DRY_RUN === 'true';
+              
+              if (isDryRun) {
+                console.log(`🔍 DRY RUN: Would publish article:`);
+                console.log(`   Title: ${article.title}`);
+                console.log(`   Tags: ${article.tags.join(', ')}`);
+                console.log(`   Description: ${article.description}`);
+                console.log(`   Canonical URL: ${article.canonical_url}`);
+                return;
               }
 
               // Make API request
@@ -127,7 +149,7 @@ jobs:
           node publish.js "${{ steps.find-articles.outputs.articles }}"
 
       - name: Commit URL updates
-        if: steps.find-articles.outputs.articles != ''
+        if: steps.find-articles.outputs.articles != '' && github.event.inputs.dry_run != 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
