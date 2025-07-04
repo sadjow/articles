@@ -2,7 +2,7 @@
 title: Claude Code meets Nix: When Your AI Assistant Needs a Bunker
 published: false
 description: How I solved the global npm package problem with a sledgehammer called Nix
-tags: nix, nodejs, devtools, claude
+tags: [nix, nodejs, devtools, claude]
 date: 2025-07-03
 cover_image: 
 canonical_url: 
