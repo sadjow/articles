@@ -6,8 +6,8 @@ A collection of my writing on technology, development practices, and other topic
 
 ### 2025
 
-- **[A Self-Updating Nix Flake for Claude Code](technical/2025/self-updating-nix-flake-claude-code.md)**
-  - Building a Nix flake that keeps Claude Code fresh with automated daily updates
+- **[Claude Code: Properly Packaged and Always Fresh with Nix Flakes](technical/2025/self-updating-nix-flake-claude-code.md)**
+  - A Nix flake that makes Claude Code properly packaged and up to date
   - Topics: `nix`, `nodejs`, `devtools`, `claude`
   - Status: Published
 
