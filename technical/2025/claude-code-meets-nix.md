@@ -22,7 +22,7 @@ This gets worse with tools like Claude Code that you want available everywhere, 
 
 ## Enter Nix: Proper Packaging Done Right
 
-Nix doesn't do things halfway. Where other package managers would give you a shrug and a "works on my machine," Nix brings determinism to the chaos. And that's exactly what we need here.
+Nix doesn't do things halfway. Where other package managers would give you a shrug and a "works on my machine", Nix brings determinism to the chaos. And that's exactly what we need here.
 
 The claude-code-nix package bundles Claude Code with its own Node.js LTS runtime. Not your system Node. Not your project's Node. Its own, isolated, "I-don't-care-what-version-you're-running" Node. This isn't elegant—it's bulletproof.
 
