@@ -49,7 +49,7 @@ It's also not a one-click install. You need Nix. You probably want Home Manager.
 
 ## Looking Forward
 
-The automated update system deserves a mention. A GitHub Action checks daily for new Claude Code versions, creates a PR with the update, and runs tests on Ubuntu and macOS. It's the kind of automation that makes maintenance painless—very much in the spirit of Nix's declarative approach.
+The automated update system deserves a mention. A GitHub Action runs daily in the package repository, checking for new Claude Code versions. When found, it automatically builds the package for x86_64-linux, x86_64-darwin, and aarch64-darwin, runs tests, and pushes the binaries to Cachix. This means you're always one command away from the latest version—no waiting for manual package bumps or compiling from source.
 
 This project showcases what Nix excels at: taking a messy, stateful problem and wrapping it in declarative, reproducible configuration. It's not always pretty, but it's reliable. And in the world of development tools, I'll take reliable over pretty any day.
 
