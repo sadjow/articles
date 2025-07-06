@@ -1,5 +1,5 @@
 ---
-title: Claude Code meets Nix: When Your AI Assistant Needs a Bunker
+title: Claude Code meets Nix: Your AI Assistant, Properly Packaged
 published: false
 description: How I solved the global npm package problem with a sledgehammer called Nix
 tags: [nix, nodejs, devtools, claude]
@@ -8,7 +8,7 @@ cover_image:
 canonical_url: 
 ---
 
-# Claude Code meets Nix: When Your AI Assistant Needs a Bunker
+# Claude Code meets Nix: Your AI Assistant, Properly Packaged
 
 Ever had that moment where you switch Node versions and suddenly half your global tools vanish? Yeah, me too. That's exactly why I packaged Claude Code with Nix.
 
