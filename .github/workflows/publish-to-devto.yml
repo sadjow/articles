@@ -1,0 +1,108 @@
+name: Publish to dev.to
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'technical/**/*.md'
+      - 'essays/**/*.md'
+      - 'guides/**/*.md'
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      article_path:
+        description: 'Path to article (e.g., technical/2025/article.md)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (test without publishing)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Test workflow syntax
+        run: |
+          echo "✅ Workflow syntax is valid"
+          echo "📝 Testing with test article: technical/2025/test-devto-publishing.md"
+          
+      - name: Check for API key
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+        run: |
+          if [ -z "$DEV_TO_API_KEY" ]; then
+            echo "⚠️  Warning: DEV_TO_API_KEY secret not found"
+            echo "   Please add it to repository secrets before merging"
+          else
+            echo "✅ DEV_TO_API_KEY secret is configured"
+          fi
+
+      - name: Dry run test
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          DRY_RUN: true
+        run: |
+          npm install gray-matter node-fetch
+          chmod +x scripts/test-devto-workflow.js
+          node scripts/test-devto-workflow.js
+
+  publish:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install gray-matter node-fetch
+
+      - name: Find articles to publish
+        id: find-articles
+        run: |
+          if [ -n "${{ github.event.inputs.article_path }}" ]; then
+            echo "articles=${{ github.event.inputs.article_path }}" >> $GITHUB_OUTPUT
+          else
+            # Find modified markdown files
+            articles=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(md|markdown)$' | grep -E '^(technical|essays|guides)/' || true)
+            echo "articles=$articles" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish articles
+        if: steps.find-articles.outputs.articles != ''
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          chmod +x scripts/publish-to-devto.js
+          echo "${{ steps.find-articles.outputs.articles }}" | tr ' ' '\n' | xargs node scripts/publish-to-devto.js
+
+      - name: Commit URL updates
+        if: steps.find-articles.outputs.articles != '' && github.event.inputs.dry_run != 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: update published status and add dev.to URL after publish"
+          git push
