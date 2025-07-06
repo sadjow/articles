@@ -1,8 +1,10 @@
-# Ignore all files in drafts by default
-*
-
-# But track this .gitignore
+# Track this .gitignore
 !.gitignore
 
-# Track specific drafts when ready
-# !ready-to-review-article.md
+# Track all markdown files in drafts
+!*.md
+
+# Ignore temporary files
+*.tmp
+*.swp
+*~
