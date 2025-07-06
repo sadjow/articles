@@ -47,7 +47,7 @@ Let's be honest: this isn't for everyone. If you're happy with `npm install -g` 
 
 It's also not a one-click install. You need Nix. You probably want Home Manager. You definitely need to understand what you're doing. But once it's set up? It just works. Every time. In every project. With every Node version.
 
-## Looking Forward
+## How It Stays Up to Date
 
 The automated update system deserves a mention. A GitHub Action runs daily in the package repository, checking for new Claude Code versions. When found, it automatically builds the package for x86_64-linux, x86_64-darwin, and aarch64-darwin, runs tests, and pushes the binaries to Cachix. This means you're always one command away from the latest version—no waiting for manual package bumps or compiling from source.
 
