@@ -1,7 +1,7 @@
 ---
 title: Claude Code meets Nix: Your AI Assistant, Properly Packaged
 published: false
-description: How I solved the global npm package problem with a sledgehammer called Nix
+description: How I solved the global npm package problem with proper packaging in Nix
 tags: [nix, nodejs, devtools, claude]
 date: 2025-07-03
 cover_image: 
@@ -22,7 +22,7 @@ This gets worse with tools like Claude Code that you want available everywhere, 
 
 And don't get me started on macOS. Every time Claude Code updates, macOS treats it like a brand new app. "Claude would like to access your documents folder." Again. And again. It's death by a thousand permission dialogs.
 
-## Enter Nix: The Sledgehammer Solution
+## Enter Nix: Proper Packaging Done Right
 
 Nix doesn't do things halfway. Where other package managers would give you a shrug and a "works on my machine," Nix brings determinism to the chaos. And that's exactly what we need here.
 
