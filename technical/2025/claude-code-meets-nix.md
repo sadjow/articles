@@ -5,7 +5,7 @@ description: How I solved the global npm package problem with proper packaging i
 tags: [nix, nodejs, devtools, claude]
 date: 2025-07-03
 cover_image: 
-canonical_url: 
+canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/claude-code-meets-nix.md
 ---
 
 # Claude Code meets Nix: Your AI Assistant, Properly Packaged
