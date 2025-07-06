@@ -1,7 +1,7 @@
 ---
-title: "Claude Code meets Nix: Your AI Assistant, Properly Packaged"
+title: "A Self-Updating Nix Flake for Claude Code"
 published: true
-description: How I solved the global npm package problem with proper packaging in Nix
+description: Building a Nix flake that keeps Claude Code fresh with automated daily updates
 tags: [nix, nodejs, devtools, claude]
 date: 2025-07-06
 cover_image: 
@@ -10,7 +10,7 @@ dev_to_id: 2660064
 dev_to_url: https://dev.to/sadjow/claude-code-meets-nix-your-ai-assistant-properly-packaged-9k5
 ---
 
-# Claude Code meets Nix: Your AI Assistant, Properly Packaged
+# A Self-Updating Nix Flake for Claude Code
 
 Ever had that moment where you switch Node versions and suddenly half your global tools vanish? Yeah, me too. That's exactly why I packaged Claude Code with Nix.
 

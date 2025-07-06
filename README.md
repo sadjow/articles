@@ -6,10 +6,10 @@ A collection of my writing on technology, development practices, and other topic
 
 ### 2025
 
-- **[Claude Code meets Nix: Your AI Assistant, Properly Packaged](technical/2025/claude-code-meets-nix.md)**
-  - How I solved the global npm package problem with proper packaging in Nix
+- **[A Self-Updating Nix Flake for Claude Code](technical/2025/claude-code-meets-nix.md)**
+  - Building a Nix flake that keeps Claude Code fresh with automated daily updates
   - Topics: `nix`, `nodejs`, `devtools`, `claude`
-  - Status: Ready to publish
+  - Status: Published
 
 ## Essays
 
