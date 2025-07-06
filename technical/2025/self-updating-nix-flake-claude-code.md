@@ -6,6 +6,8 @@ tags: [nix, nodejs, devtools, claude]
 date: 2025-07-06
 cover_image: 
 canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/self-updating-nix-flake-claude-code.md
+dev_to_id: 2661432
+dev_to_url: https://dev.to/sadjow/claude-code-properly-packaged-and-always-fresh-with-nix-flakes-1ma8
 ---
 
 Ever had that moment where you switch Node versions and suddenly half your global tools vanish? Yeah, me too. That's exactly why I packaged Claude Code with Nix.
