@@ -21,7 +21,7 @@ A collection of my writing on technology, development practices, and other topic
 
 ## About
 
-This repository contains my articles and writing. Technical articles focus on development tools, practices, and solutions to real-world problems. 
+This repository contains my articles and writing. Technical articles focus on development tools, practices, and solutions to real-world problems. Some articles are written with AI assistance for clarity and refinement, while maintaining authentic experiences and solutions. 
 
 ### Publishing
 
