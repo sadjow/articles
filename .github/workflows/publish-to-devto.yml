@@ -56,7 +56,7 @@ jobs:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           DRY_RUN: true
         run: |
-          npm install gray-matter node-fetch
+          yarn install --frozen-lockfile
           chmod +x scripts/test-devto-workflow.js
           node scripts/test-devto-workflow.js
 
@@ -76,7 +76,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install gray-matter node-fetch
+          yarn install --frozen-lockfile
 
       - name: Find articles to publish
         id: find-articles

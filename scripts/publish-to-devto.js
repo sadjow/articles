@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const matter = require('gray-matter');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import matter from 'gray-matter';
+import fetch from 'node-fetch';
 
 async function publishToDevTo(filePath) {
   try {

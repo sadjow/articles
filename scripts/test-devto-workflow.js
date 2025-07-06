@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const matter = require('gray-matter');
+import fs from 'fs';
+import matter from 'gray-matter';
 
 const testFile = 'technical/2025/test-devto-publishing.md';
 

@@ -1,0 +1,25 @@
+{
+  "name": "articles",
+  "version": "1.0.0",
+  "description": "A collection of my writing on technology, development practices, and other topics.",
+  "type": "module",
+  "scripts": {
+    "publish-to-devto": "node scripts/publish-to-devto.js",
+    "test-workflow": "node scripts/test-devto-workflow.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sadjow/articles.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/sadjow/articles/issues"
+  },
+  "homepage": "https://github.com/sadjow/articles#readme",
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "node-fetch": "^3.3.2"
+  }
+}
