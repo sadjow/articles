@@ -35,6 +35,7 @@ This isn't about making things complicated for complexity's sake. It's about rec
 With traditional package managers, you get convenience at the cost of stability. With Nix, you get both—but you pay for it in initial setup complexity. The claude-code-nix package tries to hide most of that complexity while keeping the benefits.
 
 You get:
+
 - Claude Code that works regardless of your project's Node version
 - Daily automated updates—no waiting for nixpkgs to catch up
 - Permissions that survive updates (especially important on macOS)
