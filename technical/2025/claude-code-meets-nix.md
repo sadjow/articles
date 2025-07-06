@@ -68,10 +68,10 @@ nix run home-manager/master -- init --switch
 Want to try Claude Code? Start with:
 
 ```bash
-# First, enable the binary cache for instant installation
+# Enable the binary cache for instant installation (optional but recommended)
 cachix use claude-code
 
-# Then run Claude Code
+# Run Claude Code (works without cachix, but will compile from source)
 nix run github:sadjow/claude-code-nix
 ```
 
