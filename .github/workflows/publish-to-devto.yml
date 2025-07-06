@@ -57,28 +57,8 @@ jobs:
           DRY_RUN: true
         run: |
           npm install gray-matter node-fetch
-          
-          cat > test-publish.js << 'EOF'
-          const fs = require('fs');
-          const matter = require('gray-matter');
-          
-          const testFile = 'technical/2025/test-devto-publishing.md';
-          if (fs.existsSync(testFile)) {
-            const fileContent = fs.readFileSync(testFile, 'utf8');
-            const { data: frontmatter, content } = matter(fileContent);
-            
-            console.log('🔍 Test article found:');
-            console.log(`   Title: ${frontmatter.title}`);
-            console.log(`   Published: ${frontmatter.published}`);
-            console.log(`   Tags: ${frontmatter.tags?.join(', ')}`);
-            console.log('✅ Dry run test passed!');
-          } else {
-            console.error('❌ Test article not found');
-            process.exit(1);
-          }
-          EOF
-          
-          node test-publish.js
+          chmod +x scripts/test-devto-workflow.js
+          node scripts/test-devto-workflow.js
 
   publish:
     if: github.event_name != 'pull_request'
@@ -115,104 +95,8 @@ jobs:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          cat > publish.js << 'EOF'
-          const fs = require('fs');
-          const matter = require('gray-matter');
-          const fetch = require('node-fetch');
-
-          async function publishToDevTo(filePath) {
-            try {
-              // Read the file
-              const fileContent = fs.readFileSync(filePath, 'utf8');
-              const { data: frontmatter, content } = matter(fileContent);
-
-              // Check if article should be published
-              if (frontmatter.published === false) {
-                console.log(`Skipping ${filePath} - published: false`);
-                return;
-              }
-
-              // Prepare article data
-              const article = {
-                title: frontmatter.title,
-                body_markdown: content,
-                published: true,
-                tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
-                description: frontmatter.description || '',
-                canonical_url: frontmatter.canonical_url || `https://github.com/sadjow/articles/blob/main/${filePath}`,
-              };
-
-              if (frontmatter.cover_image) {
-                article.main_image = frontmatter.cover_image;
-              }
-
-              if (frontmatter.series) {
-                article.series = frontmatter.series;
-              }
-
-              // Check for dry run
-              const isDryRun = process.env.DRY_RUN === 'true';
-              
-              if (isDryRun) {
-                console.log(`🔍 DRY RUN: Would publish article:`);
-                console.log(`   Title: ${article.title}`);
-                console.log(`   Tags: ${article.tags.join(', ')}`);
-                console.log(`   Description: ${article.description}`);
-                console.log(`   Canonical URL: ${article.canonical_url}`);
-                return;
-              }
-
-              // Make API request
-              const response = await fetch('https://dev.to/api/articles', {
-                method: 'POST',
-                headers: {
-                  'api-key': process.env.DEV_TO_API_KEY,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ article }),
-              });
-
-              if (response.ok) {
-                const result = await response.json();
-                console.log(`✅ Published: ${frontmatter.title}`);
-                console.log(`   URL: ${result.url}`);
-                
-                // Update published status to true
-                let updatedContent = fileContent.replace(
-                  /published:\s*false/,
-                  'published: true'
-                );
-                
-                // Add dev.to URL as a comment for reference
-                const devtoComment = `\ndev_to_url: ${result.url}`;
-                if (!frontmatter.dev_to_url) {
-                  updatedContent = updatedContent.replace(
-                    /^(---[\s\S]*?)(\n---)/m,
-                    `$1${devtoComment}$2`
-                  );
-                }
-                
-                fs.writeFileSync(filePath, updatedContent);
-              } else {
-                const error = await response.text();
-                console.error(`❌ Failed to publish ${filePath}: ${error}`);
-              }
-            } catch (error) {
-              console.error(`❌ Error processing ${filePath}: ${error.message}`);
-            }
-          }
-
-          // Process articles
-          const articles = process.argv[2].split('\n').filter(Boolean);
-          
-          (async () => {
-            for (const article of articles) {
-              await publishToDevTo(article);
-            }
-          })();
-          EOF
-
-          node publish.js "${{ steps.find-articles.outputs.articles }}"
+          chmod +x scripts/publish-to-devto.js
+          echo "${{ steps.find-articles.outputs.articles }}" | tr ' ' '\n' | xargs node scripts/publish-to-devto.js
 
       - name: Commit URL updates
         if: steps.find-articles.outputs.articles != '' && github.event.inputs.dry_run != 'true'
