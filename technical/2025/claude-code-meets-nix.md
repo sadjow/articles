@@ -16,7 +16,7 @@ Here's the thing: Claude Code is fantastic. But when you're juggling multiple pr
 
 ## The Problem Nobody Talks About
 
-Most developers treat global npm packages like system utilities. We `npm install -g` something and expect it to just... work. Forever. But that's not how Node's ecosystem operates. Your global packages are tied to specific Node versions, living in version-specific directories that your shell might not even know about after a version switch.
+Most developers treat global npm packages like system utilities. We `npm install -g` something and expect it to just... work. Forever. But that's not how Node's ecosystem operates. With version managers like nvm or asdf, your global packages are tied to specific Node versions, living in version-specific directories that vanish when you switch versions. Even with the official Node installer, upgrades can break global packages due to compatibility issues—and npm's own docs recommend against using it for development.
 
 This gets worse with tools like Claude Code that you want available everywhere, all the time. It's not project-specific—it's a development companion. Having it disappear because you switched Node versions is like your hammer vanishing because you moved from the garage to the kitchen.
 
