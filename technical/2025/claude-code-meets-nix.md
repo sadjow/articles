@@ -53,6 +53,8 @@ The automated update system deserves a mention. A GitHub Action runs daily in th
 
 This project showcases what Nix excels at: taking a messy, stateful problem and wrapping it in declarative, reproducible configuration. It's not always pretty, but it's reliable. And in the world of development tools, I'll take reliable over pretty any day.
 
+## Getting Started
+
 Want to try it? Start with:
 
 ```bash
