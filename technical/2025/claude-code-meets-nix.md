@@ -68,3 +68,10 @@ If that works for you, consider the full installation. Your future self will tha
 ---
 
 *The claude-code-nix package is available at [github.com/sadjow/claude-code-nix](https://github.com/sadjow/claude-code-nix). It's MIT licensed (the packaging, not Claude Code itself), and contributions are welcome—especially if you've found new and creative ways to make development tools behave.*
+
+## References
+
+- [Nix](https://nixos.org/) - The purely functional package manager
+- [Home Manager](https://github.com/nix-community/home-manager) - Manage user environments using Nix
+- [Cachix](https://cachix.org/) - Binary cache hosting for Nix
+- [Claude Code](https://claude.ai/code) - The AI coding assistant this package wraps
