@@ -4,6 +4,24 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import fetch from 'node-fetch';
 
+async function getArticleByPath(apiKey, canonicalUrl) {
+  try {
+    const response = await fetch('https://dev.to/api/articles/me/published', {
+      headers: {
+        'api-key': apiKey,
+      },
+    });
+
+    if (response.ok) {
+      const articles = await response.json();
+      return articles.find(article => article.canonical_url === canonicalUrl);
+    }
+  } catch (error) {
+    console.error('Error fetching articles:', error.message);
+  }
+  return null;
+}
+
 async function publishToDevTo(filePath) {
   try {
     // Read the file
@@ -46,35 +64,77 @@ async function publishToDevTo(filePath) {
       return;
     }
 
-    // Make API request
-    const response = await fetch('https://dev.to/api/articles', {
-      method: 'POST',
-      headers: {
-        'api-key': process.env.DEV_TO_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ article }),
-    });
+    const apiKey = process.env.DEV_TO_API_KEY;
+    if (!apiKey) {
+      throw new Error('DEV_TO_API_KEY environment variable is required');
+    }
+
+    // Check if article already exists
+    let existingArticle = null;
+    if (frontmatter.dev_to_id) {
+      // If we have an ID, use it
+      existingArticle = { id: frontmatter.dev_to_id };
+    } else {
+      // Otherwise, try to find by canonical URL
+      existingArticle = await getArticleByPath(apiKey, article.canonical_url);
+    }
+
+    let response;
+    let result;
+
+    if (existingArticle) {
+      // Update existing article
+      console.log(`📝 Updating existing article (ID: ${existingArticle.id})`);
+      response = await fetch(`https://dev.to/api/articles/${existingArticle.id}`, {
+        method: 'PUT',
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ article }),
+      });
+    } else {
+      // Create new article
+      console.log(`📤 Publishing new article`);
+      response = await fetch('https://dev.to/api/articles', {
+        method: 'POST',
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ article }),
+      });
+    }
 
     if (response.ok) {
-      const result = await response.json();
-      console.log(`✅ Published: ${frontmatter.title}`);
+      result = await response.json();
+      const action = existingArticle ? 'Updated' : 'Published';
+      console.log(`✅ ${action}: ${frontmatter.title}`);
       console.log(`   URL: ${result.url}`);
       
-      // Update published status to true
-      let updatedContent = fileContent.replace(
+      // Update frontmatter with dev.to info
+      let updatedContent = fileContent;
+      
+      // Add or update dev_to_id
+      if (!frontmatter.dev_to_id) {
+        const devtoMeta = `\ndev_to_id: ${result.id}\ndev_to_url: ${result.url}`;
+        updatedContent = updatedContent.replace(
+          /^(---[\s\S]*?)(\n---)/m,
+          `$1${devtoMeta}$2`
+        );
+      } else if (frontmatter.dev_to_url !== result.url) {
+        // Update URL if it changed
+        updatedContent = updatedContent.replace(
+          /dev_to_url:\s*.*/,
+          `dev_to_url: ${result.url}`
+        );
+      }
+      
+      // Ensure published is true
+      updatedContent = updatedContent.replace(
         /published:\s*false/,
         'published: true'
       );
-      
-      // Add dev.to URL as a comment for reference
-      const devtoComment = `\ndev_to_url: ${result.url}`;
-      if (!frontmatter.dev_to_url) {
-        updatedContent = updatedContent.replace(
-          /^(---[\s\S]*?)(\n---)/m,
-          `$1${devtoComment}$2`
-        );
-      }
       
       fs.writeFileSync(filePath, updatedContent);
     } else {

@@ -107,5 +107,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git diff --staged --quiet || git commit -m "chore: update published status and add dev.to URL after publish"
+          git diff --staged --quiet || git commit -m "chore: sync article metadata with dev.to"
           git push
