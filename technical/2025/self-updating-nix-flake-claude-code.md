@@ -5,7 +5,7 @@ description: Building a Nix flake that keeps Claude Code fresh with automated da
 tags: [nix, nodejs, devtools, claude]
 date: 2025-07-06
 cover_image: 
-canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/claude-code-meets-nix.md
+canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/self-updating-nix-flake-claude-code.md
 dev_to_id: 2660064
 dev_to_url: https://dev.to/sadjow/claude-code-meets-nix-your-ai-assistant-properly-packaged-9k5
 ---
