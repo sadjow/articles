@@ -15,3 +15,7 @@
 # Private notes
 private/
 notes/
+
+# Node
+node_modules/
+package-lock.json
