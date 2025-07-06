@@ -1,5 +1,5 @@
 ---
-title: Claude Code meets Nix: Your AI Assistant, Properly Packaged
+title: "Claude Code meets Nix: Your AI Assistant, Properly Packaged"
 published: false
 description: How I solved the global npm package problem with proper packaging in Nix
 tags: [nix, nodejs, devtools, claude]
