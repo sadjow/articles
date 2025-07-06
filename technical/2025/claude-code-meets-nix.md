@@ -28,13 +28,6 @@ Nix doesn't do things halfway. Where other package managers would give you a shr
 
 The claude-code-nix package bundles Claude Code with its own Node.js LTS runtime. Not your system Node. Not your project's Node. Its own, isolated, "I-don't-care-what-version-you're-running" Node. This isn't elegant—it's bulletproof.
 
-```nix
-nativeBuildInputs = [ 
-  nodejs_22   # Claude gets its own Node LTS
-  cacert      # Because npm needs to trust something
-];
-```
-
 But here's where it gets interesting. The package doesn't just wrap Claude Code; it actively prevents the kind of issues that drive developers crazy. Your project's npm remains untouched, updates are managed through Nix, and Claude's configuration persists across system changes.
 
 ## Why This Matters
