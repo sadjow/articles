@@ -6,8 +6,6 @@ tags: [nix, nodejs, devtools, claude]
 date: 2025-07-06
 cover_image: 
 canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/self-updating-nix-flake-claude-code.md
-dev_to_id: 2660064
-dev_to_url: https://dev.to/sadjow/claude-code-meets-nix-your-ai-assistant-properly-packaged-9k5
 ---
 
 # Claude Code: Properly Packaged and Always Fresh with Nix Flakes
