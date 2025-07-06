@@ -43,7 +43,7 @@ You get:
 
 ## The Trade-offs
 
-Let's be honest: this isn't for everyone. If you're happy with `npm install -g` and don't mind the occasional reinstall, stick with that. This package is for people who've been burned one too many times by version conflicts and permission resets.
+Let's be honest: this isn't for everyone. If you're happy with `npm install -g` and don't switch Node versions often, stick with that. But if you've ever lost a tool after switching versions, or if you just appreciate having your development tools properly isolated and always available, this approach might resonate with you.
 
 It's also not a one-click install. You need Nix. You probably want Home Manager. You definitely need to understand what you're doing. But once it's set up? It just works. Every time. In every project. With every Node version.
 
