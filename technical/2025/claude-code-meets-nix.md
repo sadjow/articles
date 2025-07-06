@@ -14,7 +14,7 @@ Ever had that moment where you switch Node versions and suddenly half your globa
 
 Here's the thing: Claude Code is fantastic. But when you're juggling multiple projects with different Node versions through devenv, asdf, or nvm, that globally installed `npm install -g @anthropic-ai/claude-code` becomes a house of cards. Switch to Node 18 for one project? Claude disappears. Jump to Node 22 for another? Good luck finding where npm stashed it this time.
 
-## The Problem Nobody Talks About
+## The Hidden Cost of npm install -g
 
 Most developers treat global npm packages like system utilities. We `npm install -g` something and expect it to just... work. Forever. But that's not how Node's ecosystem operates. With version managers like nvm or asdf, your global packages are tied to specific Node versions, living in version-specific directories that vanish when you switch versions. Even with the official Node installer, upgrades can break global packages due to compatibility issues—and npm's own docs recommend against using it for development.
 
