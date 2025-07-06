@@ -8,8 +8,6 @@ cover_image:
 canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/self-updating-nix-flake-claude-code.md
 ---
 
-# Claude Code: Properly Packaged and Always Fresh with Nix Flakes
-
 Ever had that moment where you switch Node versions and suddenly half your global tools vanish? Yeah, me too. That's exactly why I packaged Claude Code with Nix.
 
 Here's the thing: Claude Code is fantastic. But when you're juggling multiple projects with different Node versions through devenv, asdf, or nvm, that globally installed `npm install -g @anthropic-ai/claude-code` becomes a house of cards. Switch to Node 18 for one project? Claude disappears. Jump to Node 22 for another? Good luck finding where npm stashed it this time.
