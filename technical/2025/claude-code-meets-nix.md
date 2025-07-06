@@ -55,7 +55,17 @@ This project showcases what Nix excels at: taking a messy, stateful problem and 
 
 ## Getting Started
 
-Want to try it? Start with:
+First time with Nix? Here's the quickest path:
+
+```bash
+# Install Nix (if you haven't already)
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# Install Home Manager (optional but recommended)
+nix run home-manager/master -- init --switch
+```
+
+Want to try Claude Code? Start with:
 
 ```bash
 # First, enable the binary cache for instant installation
@@ -66,6 +76,8 @@ nix run github:sadjow/claude-code-nix
 ```
 
 If that works for you, consider the full installation. Your future self will thank you the next time you switch Node versions and Claude is still there, ready to help, permissions intact.
+
+For a complete development environment setup with Nix and Home Manager, check out my [home-manager configuration](https://github.com/sadjow/home-manager)—it includes this Claude Code package and many other development tools properly packaged.
 
 ---
 
