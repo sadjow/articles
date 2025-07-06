@@ -2,7 +2,7 @@
 title: "Claude Code: Properly Packaged and Always Fresh with Nix Flakes"
 published: true
 description: A Nix flake that makes Claude Code properly packaged and up to date
-tags: [nix, nodejs, devtools, claude]
+tags: [nix, automation, devtools, claude]
 date: 2025-07-06
 cover_image: 
 canonical_url: https://github.com/sadjow/articles/blob/main/technical/2025/self-updating-nix-flake-claude-code.md
