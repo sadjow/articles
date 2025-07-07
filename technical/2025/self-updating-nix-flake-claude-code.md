@@ -87,7 +87,7 @@ For a complete development environment setup with Nix and Home Manager, check ou
 
 This article and the claude-code-nix flake itself—were created with AI assistance. I used Claude to help review drafts, refine ideas, and improve clarity. But here's what matters: the problems described are real, the solution works, and the implementation reflects years of experience with Nix and development workflows.
 
-AI kept me in flow state during both writing and coding. It offered insights, caught inconsistencies, and helped articulate ideas I struggled to express. The experience and judgment, however, remain human. Think of it as pair programming where one partner never gets tired and has read all the documentation.
+AI kept me in flow state during both writing and coding. It offered insights, caught inconsistencies, and helped articulate ideas. The experience and judgment, however, remain human. Think of it as pair programming where one partner never gets tired and has read all the documentation.
 
 ## References
 
