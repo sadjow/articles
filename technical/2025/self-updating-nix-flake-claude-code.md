@@ -22,34 +22,49 @@ This gets worse with tools like Claude Code that you want available everywhere, 
 
 ## Enter Nix: Proper Packaging Done Right
 
-Nix doesn't do things halfway. Where other package managers would give you a shrug and a "works on my machine", Nix brings determinism to the chaos. And that's exactly what we need here.
+Both nixpkgs upstream and this flake solve the fundamental npm global problem—they bundle Claude Code with its own Node.js runtime. Not your system Node. Not your project's Node. Its own, isolated, "I-don't-care-what-version-you're-running" Node. This isn't elegant—it's bulletproof.
 
-The claude-code-nix package bundles Claude Code with its own Node.js LTS runtime. Not your system Node. Not your project's Node. Its own, isolated, "I-don't-care-what-version-you're-running" Node. This isn't elegant—it's bulletproof.
+But here's where this flake differentiates itself: while upstream nixpkgs is locked to Node.js 20 with no override option, this package uses Node.js 22 LTS. And more importantly, it's updated within an hour of new releases, not weeks later.
 
-But here's where it gets interesting. The package doesn't just wrap Claude Code; it actively prevents the kind of issues that drive developers crazy. Your project's npm remains untouched, updates are managed through Nix, and Claude's configuration persists across system changes.
+## Why This Package Over Upstream nixpkgs?
 
-## Why This Matters
+While Claude Code exists in nixpkgs and solves the npm global problem, this dedicated flake offers specific advantages:
 
-This isn't about making things complicated for complexity's sake. It's about recognizing that development tools should be reliable infrastructure, not fragile dependencies.
+**Speed of Updates**: The biggest differentiator. This flake checks for updates every hour and publishes immediately. Upstream nixpkgs can take days to weeks for PR reviews and channel propagation. When Claude Code pushes a critical fix, you get it in under an hour, not next week.
 
-With traditional package managers, you get convenience at the cost of stability. With Nix, you get both—but you pay for it in initial setup complexity. The claude-code-nix package tries to hide most of that complexity while keeping the benefits.
+**Node.js Version Control**: Upstream is hardcoded to Node.js 20 as a function parameter—you can't override it. This flake uses Node.js 22 LTS, giving you better performance and the latest security updates.
+
+**Dedicated Maintenance**: When Claude Code changes its requirements or adds new validations, this repository can adapt immediately without waiting for the nixpkgs contribution process.
 
 You get:
-- Claude Code that works regardless of your project's Node version
-- Daily automated updates—no waiting for nixpkgs to catch up
-- Permissions that survive updates (especially important on macOS)
-- Configuration that persists across system changes
-- Pre-built binaries via Cachix—no compilation needed
+- Updates within 1 hour of npm release (vs days/weeks for nixpkgs)
+- Node.js 22 LTS for better performance (vs locked Node.js 20)
+- Direct flake usage with binary cache via Cachix
+- Immediate fixes when Claude Code changes
+- Full control over the packaging implementation
 
 ## The Trade-offs
 
-Let's be honest: this isn't for everyone. If you're happy with `npm install -g` and don't switch Node versions often, stick with that. But if you've ever lost a tool after switching versions, or if you just appreciate having your development tools properly isolated and always available, this approach might resonate with you.
+Let's be honest about the comparison:
 
-It's also not a one-click install. You need Nix. You probably want Home Manager. You definitely need to understand what you're doing. But once it's set up? It just works. Every time. In every project. With every Node version.
+**npm global** is simplest if you never switch Node versions. But one `nvm use` or `asdf install` and Claude disappears.
 
-## How It Stays Up to Date
+**nixpkgs upstream** solves the isolation problem and is well-maintained. But you're at the mercy of PR review times and locked to Node.js 20.
 
-The automated update system deserves a mention. A GitHub Action runs daily in the package repository, checking for new Claude Code versions. When found, it automatically builds the package for x86_64-linux, x86_64-darwin, and aarch64-darwin, runs tests, and pushes the binaries to Cachix. This means you're always one command away from the latest version—no waiting for manual package bumps or compiling from source.
+**This flake** gives you the fastest updates and latest Node.js, but requires trusting a third-party repository (though the code is open and simple to audit).
+
+Choose based on your priorities: simplicity (npm), stability (nixpkgs), or bleeding-edge updates (this flake).
+
+## How It Stays Fresh: Hourly Updates
+
+The automated update system is what makes this flake special. A GitHub Action runs every hour, checking npm for new Claude Code versions. When found, it automatically:
+1. Updates the version and calculates the new hash
+2. Creates a pull request with the changes
+3. Builds and tests on Linux and macOS
+4. Auto-merges if all checks pass
+5. Pushes pre-built binaries to Cachix
+
+This means new Claude Code versions are available within 30-60 minutes of npm release. Compare that to nixpkgs where you might wait weeks for the PR to be reviewed and merged, then more time for it to reach your channel.
 
 This project showcases what Nix excels at: taking a messy, stateful problem and wrapping it in declarative, reproducible configuration. It's not always pretty, but it's reliable. And in the world of development tools, I'll take reliable over pretty any day.
 
