@@ -10,101 +10,169 @@ dev_to_id: 2661432
 dev_to_url: https://dev.to/sadjow/claude-code-properly-packaged-and-always-fresh-with-nix-flakes-1ma8
 ---
 
-Ever had that moment where you switch Node versions and suddenly half your global tools vanish? Yeah, me too. That's exactly why I packaged Claude Code with Nix.
+> **TL;DR**
+> - Global `npm install -g` tools vanish when you switch Node versions. Nix fixes that.
+> - This flake bundles Claude Code with its **own** Node 22 LTS runtime and ships **hourly** updates.
+> - Use it with `nix run` for zero setup, or add it to Home Manager/devshell for a permanent, reproducible install.
 
-Here's the thing: Claude Code is fantastic. But when you're juggling multiple projects with different Node versions through devenv, asdf, or nvm, that globally installed `npm install -g @anthropic-ai/claude-code` becomes a house of cards. Switch to Node 18 for one project? Claude disappears. Jump to Node 22 for another? Good luck finding where npm stashed it this time.
+Ever switched Node versions and watched half your CLI tools evaporate? Same. That's why I packaged **Claude Code** with **Nix**.
 
-## The Hidden Cost of npm install -g
+Global npm installs are fragile—especially with `nvm`, `asdf`, or per-project Node. When you hop between versions, your "globals" live in versioned directories that come and go. The result: tools like Claude Code disappear exactly when you need them most.
 
-Most developers treat global npm packages like system utilities. We `npm install -g` something and expect it to just... work. Forever. But that's not how Node's ecosystem operates. With version managers like nvm or asdf, your global packages are tied to specific Node versions, living in version-specific directories that vanish when you switch versions. Even with the official Node installer, upgrades can break global packages due to compatibility issues—and npm's own docs recommend against using it for development.
+## Nix to the Rescue
 
-This gets worse with tools like Claude Code that you want available everywhere, all the time. It's not project-specific—it's a development companion. Having it disappear because you switched Node versions is like your hammer vanishing because you moved from the garage to the kitchen.
+Nix packages Claude Code with an **isolated** Node runtime. Not your system Node. Not your project Node. Its **own** Node. That means:
 
-## Enter Nix: Proper Packaging Done Right
+- No more hunting for where npm stashed it this time
+- No breakage when switching Node versions or machines
+- Reproducible installs across macOS and Linux
 
-Both nixpkgs upstream and this flake solve the fundamental npm global problem—they bundle Claude Code with its own Node.js runtime. Not your system Node. Not your project's Node. Its own, isolated, "I-don't-care-what-version-you're-running" Node. This isn't elegant—it's bulletproof.
+Both **nixpkgs** and **this flake** solve the "global npm" problem. The differences are about **speed**, **Node version**, and **control**.
 
-But here's where this flake differentiates itself: while upstream nixpkgs is locked to Node.js 20 with no override option, this package uses Node.js 22 LTS. And more importantly, it's updated within an hour of new releases, not weeks later.
+### Why Use This Flake (vs. Upstream nixpkgs)?
 
-## Why This Package Over Upstream nixpkgs?
+- **Faster updates.** A scheduled workflow checks npm **hourly** and publishes immediately (build → test → merge → push binaries to Cachix). You get new Claude Code releases within ~1 hour.
+- **Modern runtime.** Upstream is pinned to **Node 20**; this flake uses **Node 22 LTS** for performance and security.
+- **Focused maintenance.** If Claude Code changes its packaging needs, this repo adapts instantly—without waiting on nixpkgs PR review and channel propagation.
 
-While Claude Code exists in nixpkgs and solves the npm global problem, this dedicated flake offers specific advantages:
+**In short:** if you want **latest Claude Code quickly** and you prefer **Node 22 LTS**, use this flake.
 
-**Speed of Updates**: The biggest differentiator. This flake checks for updates every hour and publishes immediately. Upstream nixpkgs can take days to weeks for PR reviews and channel propagation. When Claude Code pushes a critical fix, you get it in under an hour, not next week.
+## Quickstart
 
-**Node.js Version Control**: Upstream is hardcoded to Node.js 20 as a function parameter—you can't override it. This flake uses Node.js 22 LTS, giving you better performance and the latest security updates.
-
-**Dedicated Maintenance**: When Claude Code changes its requirements or adds new validations, this repository can adapt immediately without waiting for the nixpkgs contribution process.
-
-You get:
-- Updates within 1 hour of npm release (vs days/weeks for nixpkgs)
-- Node.js 22 LTS for better performance (vs locked Node.js 20)
-- Direct flake usage with binary cache via Cachix
-- Immediate fixes when Claude Code changes
-- Full control over the packaging implementation
-
-## The Trade-offs
-
-Let's be honest about the comparison:
-
-**npm global** is simplest if you never switch Node versions. But one `nvm use` or `asdf install` and Claude disappears.
-
-**nixpkgs upstream** solves the isolation problem and is well-maintained. But you're at the mercy of PR review times and locked to Node.js 20.
-
-**This flake** gives you the fastest updates and latest Node.js, but requires trusting a third-party repository (though the code is open and simple to audit).
-
-Choose based on your priorities: simplicity (npm), stability (nixpkgs), or bleeding-edge updates (this flake).
-
-## How It Stays Fresh: Hourly Updates
-
-The automated update system is what makes this flake special. A GitHub Action runs every hour, checking npm for new Claude Code versions. When found, it automatically:
-1. Updates the version and calculates the new hash
-2. Creates a pull request with the changes
-3. Builds and tests on Linux and macOS
-4. Auto-merges if all checks pass
-5. Pushes pre-built binaries to Cachix
-
-This means new Claude Code versions are available within 30-60 minutes of npm release. Compare that to nixpkgs where you might wait weeks for the PR to be reviewed and merged, then more time for it to reach your channel.
-
-This project showcases what Nix excels at: taking a messy, stateful problem and wrapping it in declarative, reproducible configuration. It's not always pretty, but it's reliable. And in the world of development tools, I'll take reliable over pretty any day.
-
-## Getting Started
-
-First time with Nix? Here's the quickest path:
+Install Nix (and optionally Home Manager) the easy way:
 
 ```bash
-# Install Nix (if you haven't already)
+# Install Nix
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
-# Install Home Manager (optional but recommended)
+# (Optional) Initialize Home Manager
 nix run home-manager/master -- init --switch
 ```
 
-Want to try Claude Code? Start with:
+Run Claude Code instantly (no system-wide changes):
 
 ```bash
-# Enable the binary cache for instant installation (optional but recommended)
+# Optional: use the binary cache for fast, no-build installs
 cachix use claude-code
 
-# Run Claude Code (works without cachix, but will compile from source)
+# Run once (or whenever you need it)
 nix run github:sadjow/claude-code-nix
 ```
 
-If that works for you, consider the full installation. Your future self will thank you the next time you switch Node versions and Claude is still there, ready to help, permissions intact.
+Pin it to your user profile (survives shells and reboots):
+
+```bash
+nix profile install github:sadjow/claude-code-nix
+claude --version
+```
+
+## Add to Home Manager
+
+Make Claude Code part of your reproducible dotfiles:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+  };
+
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, ... }:
+    let
+      system = "x86_64-darwin"; # or x86_64-linux/aarch64-darwin/aarch64-linux
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      homeConfigurations."your-user" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [{
+          home.packages = [
+            claude-code-nix.packages.${system}.claude-code
+          ];
+          # Optional, convenience alias
+          programs.bash.shellAliases.ccode = "claude";
+        }];
+      };
+    };
+}
+```
+
+## Add to a Dev Shell
+
+Keep Claude Code available in project shells without touching global state:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+  };
+
+  outputs = { self, nixpkgs, claude-code-nix, ... }:
+    let
+      system = "x86_64-linux"; # pick your system
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [ claude-code-nix.packages.${system}.claude-code ];
+      };
+    };
+}
+```
+
+## How It Stays Fresh
+
+The auto-update flow runs **hourly**:
+
+1. Check npm for a new `@anthropic-ai/claude-code` version
+2. Update the version + Nix hash
+3. Open a PR with changes
+4. Build + test on macOS and Linux CI
+5. Auto-merge if green and push binaries to **Cachix**
+
+Result: new releases are typically available via `nix run` within an hour of hitting npm.
+
+## Trust, Security, and Control
+
+- **Reproducible by design.** Versions and hashes are pinned; you can rebuild from source if you don't want to use the binary cache.
+- **Binary cache is optional.** If you skip Cachix, Nix will compile locally.
+- **Pin or track latest.** Pin this repo at a commit or tag to freeze; update your lock file when you want to move.
+- **Open and auditable.** The packaging is tiny and readable—easy to review or fork.
+
+## Comparison
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **npm -g** | Simple on one machine | Breaks with Node switches; path/permission drift; hard to reproduce |
+| **nixpkgs (upstream)** | Stable, reviewed, reproducible | Slower release cadence; pinned to Node 20 |
+| **This flake** | Hourly updates; Node 22 LTS; easy to integrate | Third‑party source (auditable); depends on your Cachix/CI trust model |
+
+## When to Choose What
+
+- Use **npm -g** if you truly never change Node versions and don't care about reproducibility.
+- Use **nixpkgs** if you prefer upstream curation and can wait for updates.
+- Use **this flake** if you want **fast updates**, **Node 22 LTS**, and the easiest path to keep Claude Code working everywhere.
+
+## Troubleshooting
+
+- **Build takes a while:** use `cachix use claude-code` for prebuilt binaries.
+- **Hash mismatch after a brand-new upstream release:** pull the latest flake revision or retry shortly—the hourly updater may still be in flight.
+- **Command not found after `nix profile install`:** ensure your shell sources the Nix profile (restart the shell or source your profile scripts).
+- **"Claude symlink points to invalid binary" warning:** This is a false positive. Claude Code expects a large binary file, but Nix packages it as a wrapper script—everything works correctly despite the warning.
 
 For a complete development environment setup with Nix and Home Manager, check out my [home-manager configuration](https://github.com/sadjow/home-manager)—it includes this Claude Code package and many other development tools properly packaged.
 
----
-
-*The claude-code-nix package is available at [github.com/sadjow/claude-code-nix](https://github.com/sadjow/claude-code-nix). It's MIT licensed (the packaging, not Claude Code itself), and contributions are welcome—especially if you've found new and creative ways to make development tools behave.*
-
 ## A Note on AI Collaboration
 
-This article and the claude-code-nix flake itself—were created with AI assistance. I used Claude to help review drafts, refine ideas, and improve clarity. But here's what matters: the problems described are real, the solution works, and the implementation reflects years of experience with Nix and development workflows.
+This article—and the flake—were created with AI assistance to draft, review, and polish text. The problems are real, the solution works, and the implementation reflects years of Nix + dev tooling experience.
 
 ## References
 
-- [Nix](https://nixos.org/) - The purely functional package manager
-- [Home Manager](https://github.com/nix-community/home-manager) - Manage user environments using Nix
-- [Cachix](https://cachix.org/) - Binary cache hosting for Nix
-- [Claude Code](https://claude.ai/code) - The AI coding assistant this package wraps
+- [Nix](https://nixos.org/) – Purely functional package manager
+- [Home Manager](https://github.com/nix-community/home-manager) – Manage user environments with Nix
+- [Cachix](https://cachix.org/) – Binary cache hosting for Nix
+- [Claude Code](https://claude.ai/code) – The AI coding assistant this package wraps
+
+---
+
+*The claude-code-nix package lives at [github.com/sadjow/claude-code-nix](https://github.com/sadjow/claude-code-nix). Packaging is MIT-licensed (the tool itself follows its own license). Contributions welcome—especially improvements to the updater, tests, and platform support.*
