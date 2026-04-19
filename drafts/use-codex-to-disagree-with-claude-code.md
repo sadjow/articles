@@ -10,13 +10,13 @@ canonical_url: https://github.com/sadjow/articles/blob/main/drafts/use-codex-to-
 
 I was five minutes from squash-merging when Codex stopped me.
 
-The change was one line. Swap a GCS bucket URL in a Nix flake for `downloads.claude.ai`, the Anthropic-branded CDN. Both hosts served identical bytes, the sha256 was pinned, the build passed. A community contributor had suggested it weeks earlier and I was finally carrying it across the finish line.
+The change was one line. A package pinned a single download URL; a contributor had suggested swapping it for a different host. Both served identical bytes, the sha256 was pinned, the build passed. I was finally carrying it across the finish line.
 
 Before hitting merge, I piped the diff to Codex CLI (OpenAI's coding agent, similar shape to Claude Code) with one instruction: *push back if I am wrong*.
 
 It pushed back.
 
-> The CDN is the availability risk, not the integrity risk. If downloads.claude.ai has an outage, every Nix user on this flake is blocked from rebuilds until it comes back. Use both URLs. The pinned sha256 keeps them interchangeable. Two hosts mean you survive one going down.
+> Why swap instead of list? The pinned sha256 means both URLs produce identical bytes. Use both. One URL is a single point of failure; a list of URLs is not.
 
 I would not have thought of it. Claude Code had reviewed the diff, asked a couple of clarifying questions, approved the swap. Of course it did. It was *my* swap. A model in a loop with its own output converges on agreement. The way to break that is a fresh agent prompted to disagree.
 
@@ -32,7 +32,7 @@ A normal review pair looks for bugs in the code you wrote. The builder-skeptic s
 
 Two roles, asymmetric. The first model drives. The second one fights it.
 
-In the URL example I rewrote `package.nix` to pass a `urls = [ cdn, gcs ]` list to `fetchurl`, updated the version-bump script to iterate both hosts, pushed, merged. The shipped PR was tighter than the one I had been about to ship.
+In the URL example I rewrote the fetch call to take a list of hosts instead of one, updated the version-bump script to iterate both, pushed, merged. The shipped PR was tighter than the one I had been about to ship.
 
 ## When the skeptic agrees, it still pays
 
@@ -93,7 +93,7 @@ The skeptic is not a fact-checker. It is a bias-breaker. That is the whole point
 
 Skip the pair for mechanical edits. Renaming a variable, rewriting a conditional, fixing a typo. Clear bug fixes with reproducible failures and obvious patches also do not need the detour. Use the pair for architectural decisions, API shape, anything the first model was suspiciously happy about, and PR closes whose reasoning will live in the issue tracker for years.
 
-Cost: one extra round trip per decision. For the URL example, maybe three minutes and two model invocations. The dual-URL version has been serving traffic without incident since.
+Cost: one extra round trip per decision. For the URL example, maybe three minutes and two model invocations.
 
 ## The operational rule
 
